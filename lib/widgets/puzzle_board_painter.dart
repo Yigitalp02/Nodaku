@@ -60,27 +60,31 @@ class PuzzleBoardPainter extends CustomPainter {
       final satisfied = lineStatuses[i] ?? false;
 
       final positions = line.nodeIds.map((id) => nodePositions[id]!).toList();
+      if (positions.length < 2) continue;
 
-      // Direction vector of the line (from first to last node).
-      final dir = (positions.last - positions.first);
-      final len = dir.distance;
-      if (len == 0) continue;
-      final unitDir = dir / len;
+      // Use the LOCAL segment direction at each endpoint so the stub continues
+      // the actual angle of the line entering that circle, not the
+      // overall first→last direction (which is wrong for non-straight lines).
+      final startDir = _unit(positions[0] - positions[1]);
+      final endDir   = _unit(positions.last - positions[positions.length - 2]);
 
-      // Draw stubs at both ends extending beyond the terminal circles.
-      final stubStart = positions.first - unitDir * _stubLength;
-      final stubEnd = positions.last + unitDir * _stubLength;
+      final stubStart = positions.first + startDir * _stubLength;
+      final stubEnd   = positions.last  + endDir   * _stubLength;
 
       paint.color = satisfied ? AppTheme.circleCorrect : AppTheme.lineColor;
       canvas.drawLine(positions.first, stubStart, paint);
-      canvas.drawLine(positions.last, stubEnd, paint);
+      canvas.drawLine(positions.last,  stubEnd,   paint);
 
-      // Draw the product label at whichever end was chosen during generation.
-      final atStart = labelAtStart[i] ?? false;
+      final atStart  = labelAtStart[i] ?? false;
       final labelTip = atStart ? stubStart : stubEnd;
-      final labelDir = atStart ? -unitDir : unitDir;
+      final labelDir = atStart ? startDir  : endDir;
       _drawProductLabel(canvas, labelTip, labelDir, product, satisfied);
     }
+  }
+
+  static Offset _unit(Offset v) {
+    final d = v.distance;
+    return d == 0 ? Offset.zero : v / d;
   }
 
   void _drawProductLabel(

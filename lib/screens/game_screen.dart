@@ -119,8 +119,6 @@ class _GameScreenState extends State<GameScreen> {
                             onCircleTap: _onCircleTap,
                           ),
                         ),
-                        // How-to-play panel slides up from the bottom of
-                        // this area, covering the puzzle without resizing it.
                         AnimatedSlide(
                           offset: _howToPlayOpen
                               ? Offset.zero
@@ -130,9 +128,16 @@ class _GameScreenState extends State<GameScreen> {
                           child: AnimatedOpacity(
                             opacity: _howToPlayOpen ? 1 : 0,
                             duration: const Duration(milliseconds: 220),
-                            child: const Align(
-                              alignment: Alignment.bottomCenter,
-                              child: _HowToPlayPanel(),
+                            child: IgnorePointer(
+                              ignoring: !_howToPlayOpen,
+                              child: Align(
+                                alignment: Alignment.bottomCenter,
+                                child: GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () {},
+                                  child: const _HowToPlayPanel(),
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -150,6 +155,14 @@ class _GameScreenState extends State<GameScreen> {
                 ],
               ),
 
+              // ── How-to-play tap-outside barrier (full body coverage) ──
+              if (_howToPlayOpen)
+                Positioned.fill(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => setState(() => _howToPlayOpen = false),
+                  ),
+                ),
               // ── Solve animation overlay ──
               if (_showSolveAnimation)
                 Positioned.fill(

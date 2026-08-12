@@ -18,14 +18,16 @@ The game is inspired by a classic pencil-and-paper puzzle from a mathematics boo
 ## Features
 
 - Procedural puzzle generation with uniqueness verification via backtracking solver
-- Four hand-designed puzzle shapes with varying difficulty (Tutorial, Grid, Triangle, L-Shape)
+- 19 hand-designed puzzle shapes across 5 shape families with natural difficulty progression
 - Difficulty rating (Easy / Medium / Hard) computed from constraint density
 - Randomised clue label placement — the tip of a line can appear on either end, spread intelligently to avoid visual crowding
+- Correct stub rendering: stub direction always follows the **local segment angle** at each line endpoint, not the overall first-to-last direction
 - Persistent number bar with Hint, Undo, and Erase actions
 - Auto-check: the puzzle automatically validates when all circles are filled
 - Scan-and-glow solve animation on correct completion
 - Inline error banner (appears below the difficulty badge, never covers the number bar)
-- Collapsible "How to play" panel that overlays the puzzle without shifting the layout
+- Collapsible "How to play" panel that slides over the puzzle without shifting the layout
+- Tap anywhere outside the panel to dismiss it
 - Menu and Next navigation from the success screen
 - Portrait-only orientation lock
 
@@ -84,12 +86,58 @@ test/
 
 ## Puzzle Shapes
 
+Shapes are organised into families. Each family shares the same node layout; variants differ only in how many lines are active, giving a natural easy-to-hard progression within the family.
+
+### 3-Node Triangle Family
+
 | Shape | Circles | Lines | Notes |
 |---|---|---|---|
-| Tutorial | 3 | 3 | Simple triangle, always easy |
-| Grid | 8 | 5 | Square grid with diagonals through a central hub |
-| Triangle | 7 | 6 | Layered triangle with shared interior nodes |
-| L-Shape | 5 | 4 | Asymmetric L arrangement |
+| V Shape | 3 | 2 | Open V, two edges only |
+| Tutorial | 3 | 3 | Full triangle, always easy — good for new players |
+
+### 4-Node Square Family
+
+| Shape | Circles | Lines | Notes |
+|---|---|---|---|
+| Arc | 4 | 3 | Three sides of the square (open bottom) |
+| Square | 4 | 4 | Full perimeter |
+| Square X | 4 | 5 | Perimeter + one diagonal |
+| Square XX | 4 | 6 | Perimeter + both diagonals |
+
+### 5-Node Center-Square Family
+
+| Shape | Circles | Lines | Notes |
+|---|---|---|---|
+| Kite | 5 | 4 | Asymmetric: three sides + one diagonal through center |
+| Diamond | 5 | 4 | Symmetric: top + bottom + both diagonals through center |
+| Star | 5 | 5 | Perimeter + one diagonal through center |
+| Star X | 5 | 6 | Perimeter + both diagonals through center |
+
+### 7-Node Triangle Family
+
+| Shape | Circles | Lines | Notes |
+|---|---|---|---|
+| Triangle | 7 | 4 | Outer edges + middle row (center vertical removed) |
+| Big Triangle | 7 | 5 | Outer edges + middle row + center vertical |
+
+### 8-Node Grid Family
+
+| Shape | Circles | Lines | Notes |
+|---|---|---|---|
+| Grid Open | 8 | 4 | Columns and rows only, no diagonals |
+| Grid Light | 8 | 5 | Columns + rows + one diagonal |
+| Grid | 8 | 6 | Columns + rows + both diagonals |
+
+### 8-Node Hourglass Family
+
+Node layout: two top corners + hub (top-center offset) + two mid-level side nodes + three bottom nodes.
+The X diagonals cross at the hub: top-left→hub→mid-right and top-right→hub→mid-left.
+
+| Shape | Circles | Lines | Notes |
+|---|---|---|---|
+| Hourglass Light | 8 | 5 | Columns + bottom row + X diagonals |
+| Hourglass | 8 | 6 | Hourglass Light + middle horizontal (mid-left × mid-right) |
+| Hourglass Plus | 8 | 7 | Hourglass + center vertical (hub × bottom-center) |
 
 ---
 
@@ -125,7 +173,6 @@ flutter build apk --release
 ## Roadmap
 
 - iOS build and App Store submission
-- Additional hand-designed shapes
 - Persistent progress and level tracking via shared_preferences
 - Sound effects and haptic feedback
 - Leaderboard / personal best times
